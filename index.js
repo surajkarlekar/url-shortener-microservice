@@ -4,8 +4,8 @@ const cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
 const validUrl = require("valid-url");
-const dns = require('dns');
-const urlParser = require('url');
+const dns = require("dns");
+const urlParser = require("url");
 
 // To mount the bodyParser middleware in root level which will be called for all routes
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,14 +30,16 @@ app.get("/api/hello", function (req, res) {
 //   res.json({ original_url: "https://freeCodeCamp.org", short_url: 1 });
 // });
 
-
 let urlDatabase = {}; // This will act as a simple in-memory database
 
 app.post("/api/shorturl", function (req, res) {
   let originalUrl = req.body.url;
 
-  // Check if the URL is valid
-  if (!validUrl.isUri(originalUrl)) {
+  // Check if the URL is valid and starts with http:// or https://
+  if (
+    !validUrl.isUri(originalUrl) ||
+    !(originalUrl.startsWith("http://") || originalUrl.startsWith("https://"))
+  ) {
     return res.json({ error: "invalid url" });
   }
 
@@ -66,7 +68,6 @@ app.get("/api/shorturl/:short_url", function (req, res) {
     res.json({ error: "No short URL found for the given input" });
   }
 });
-
 
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);
